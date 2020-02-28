@@ -10,5 +10,11 @@ namespace Senai.Peoples.webAPI.Domains
         public int IdFuncionario    { get; set; }
         public string Nome          { get; set; }
         public string Sobrenome     { get; set; }
+        public string  DataNascimento { get; set; }
+
+        public static implicit operator FuncionarioDomain(FuncionarioDomain v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

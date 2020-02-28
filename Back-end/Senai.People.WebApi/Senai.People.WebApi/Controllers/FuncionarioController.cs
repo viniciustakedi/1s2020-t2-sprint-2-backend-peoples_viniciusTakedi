@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Senai.Peoples.webAPI.Interfaces;
 using Senai.Peoples.webAPI.Repositories;
 using Senai.Peoples.webAPI.Domains;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Senai.Peoples.webAPI.Controllers
 {
@@ -24,6 +25,7 @@ namespace Senai.Peoples.webAPI.Controllers
             _funcionarioRepository = new FuncionarioRepository();
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IEnumerable<FuncionarioDomain> Get()
         {
@@ -51,6 +53,7 @@ namespace Senai.Peoples.webAPI.Controllers
             return Ok(funcionarioBuscado);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
         public IActionResult PutIdUrl(int id, FuncionarioDomain funcionarioAtualizado)
         {
@@ -79,11 +82,44 @@ namespace Senai.Peoples.webAPI.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             _funcionarioRepository.Deletar(id);
             return Ok("Funcionario foi deletado");
+        }
+
+        [HttpGet("buscar/{busca}")]
+        public IActionResult GetByName(string busca)
+        {
+            // Faz a chamada para o método .BuscarPorNome()
+            // Retorna a lista e um status code 200 - Ok
+            return Ok(_funcionarioRepository.BuscarPorNome(busca));
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("nomescompletos")]
+        public IActionResult GetFullName()
+        {
+            // Faz a chamada para o método .ListarNomeCompleto            
+            // Retorna a lista e um status code 200 - Ok
+            return Ok(_funcionarioRepository.ListarNomeCompleto());
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("ordenacao/{ordem}")]
+        public IActionResult GetOrderBy(string ordem)
+        {
+            // Verifica se a ordenação atende aos requisitos
+            if (ordem != "ASC" && ordem != "DESC")
+            {
+                // Caso não, retorna um status code 404 - BadRequest com uma mensagem de erro
+                return BadRequest("Não é possível ordenar da maneira solicitada. Por favor, ordene por 'ASC' ou 'DESC'");
+            }
+
+            // Retorna a lista ordenada com um status code 200 - OK
+            return Ok(_funcionarioRepository.ListarOrdenado(ordem));
         }
     }
 }

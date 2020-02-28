@@ -137,5 +137,63 @@ namespace Senai.Peoples.webAPI.Repositories
                 }
             }
         }
+
+        public List<FuncionarioDomain> BuscarPorNome(string nome)
+        {
+            // Cria uma lista funcionarios onde serão armazenados os dados
+            List<FuncionarioDomain> funcionarios = new List<FuncionarioDomain>();
+
+            // Declara a SqlConnection passando a string de conexão
+            using (SqlConnection con = new SqlConnection(stringConexao))
+            {
+                // Declara a instrução a ser executada
+                string querySelectAll = "SELECT IdFuncionario, Nome, Sobrenome, DataNascimento FROM Funcionarios" +
+                                        $" WHERE Nome LIKE '%{nome}%'";
+
+                // Abre a conexão com o banco de dados
+                con.Open();
+
+                // Declara o SqlDataReader para receber os dados do banco de dados
+                SqlDataReader rdr;
+
+                // Declara o SqlCommand passando o comando a ser executado e a conexão
+                using (SqlCommand cmd = new SqlCommand(querySelectAll, con))
+                {
+
+                    // Executa a query e armazena os dados no rdr
+                    rdr = cmd.ExecuteReader();
+
+                    // Enquanto houver registros para serem lidos no rdr, o laço se repete
+                    while (rdr.Read())
+                    {
+                        // Instancia um objeto funcionario do tipo FuncionarioDomain
+                        FuncionarioDomain funcionario = new FuncionarioDomain
+                        {
+                            // Atribui à propriedade IdFuncionario o valor da coluna IdFuncionario da tabela do banco de dados
+                            IdFuncionario = Convert.ToInt32(rdr["IdFuncionario"])
+
+                            // Atribui à propriedade Nome o valor da coluna Nome da tabela do banco de dados
+                            ,
+                            Nome = rdr["Nome"].ToString()
+
+                            // Atribui à propriedade Sobrenome o valor da coluna Sobrenome da tabela do banco de dados
+                            ,
+                            Sobrenome = rdr["Sobrenome"].ToString()
+
+                            // Atribui à propriedade DataNascimento o valor da coluna DataNascimento da tabela do banco de dados
+                            ,
+                            DataNascimento = Convert.ToDateTime(rdr["DataNascimento"])
+                        };
+
+                        // Adiciona o filme criado à lista funcionarios
+                        funcionarios.Add(funcionario);
+                    }
+                }
+            }
+
+            // Retorna a lista de funcionarios
+            return funcionarios;
+        }
+
     }
 }
